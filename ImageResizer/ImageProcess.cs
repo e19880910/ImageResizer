@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ImageResizer
@@ -40,47 +42,32 @@ namespace ImageResizer
         {
             var allFiles = FindImages(sourcePath);
 
-            //Parallel.ForEach(allFiles, filePath => 
-            //{
-            //    Image imgPhoto = Image.FromFile(filePath);
-            //    string imgName = Path.GetFileNameWithoutExtension(filePath);
-
-            //    int sourceWidth = imgPhoto.Width;
-            //    int sourceHeight = imgPhoto.Height;
-
-            //    int destionatonWidth = (int)(sourceWidth * scale);
-            //    int destionatonHeight = (int)(sourceHeight * scale);
-
-            //    Bitmap processedImage = processBitmap((Bitmap)imgPhoto,
-            //        sourceWidth, sourceHeight,
-            //        destionatonWidth, destionatonHeight);
-
-            //    string destFile = Path.Combine(destPath, imgName + ".jpg");
-            //    processedImage.Save(destFile, ImageFormat.Jpeg);
-            //});
 
             List<Task> tasks = new List<Task>();
             foreach (var filePath in allFiles)
             {
                 tasks.Add(Task.Run(() =>
-               {
-                   Image imgPhoto = Image.FromFile(filePath);
-                   string imgName = Path.GetFileNameWithoutExtension(filePath);
+                {
+                    Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId}  {Path.GetFileName(filePath)} {DateTime.Now.ToString("HH:mm:ss.fff")} >>>");
 
-                   int sourceWidth = imgPhoto.Width;
-                   int sourceHeight = imgPhoto.Height;
+                    Image imgPhoto = Image.FromFile(filePath);
+                    string imgName = Path.GetFileNameWithoutExtension(filePath);
 
-                   int destionatonWidth = (int)(sourceWidth * scale);
-                   int destionatonHeight = (int)(sourceHeight * scale);
+                    int sourceWidth = imgPhoto.Width;
+                    int sourceHeight = imgPhoto.Height;
 
-                   Bitmap processedImage = processBitmap((Bitmap)imgPhoto,
-                       sourceWidth, sourceHeight,
-                       destionatonWidth, destionatonHeight);
+                    int destionatonWidth = (int)(sourceWidth * scale);
+                    int destionatonHeight = (int)(sourceHeight * scale);
 
-                   string destFile = Path.Combine(destPath, imgName + ".jpg");
-                   processedImage.Save(destFile, ImageFormat.Jpeg);
+                    Bitmap processedImage = processBitmap((Bitmap)imgPhoto,
+                        sourceWidth, sourceHeight,
+                        destionatonWidth, destionatonHeight);
 
-               }));
+                    string destFile = Path.Combine(destPath, imgName + ".jpg");
+                    processedImage.Save(destFile, ImageFormat.Jpeg);
+
+                    Console.WriteLine($"{Thread.CurrentThread.ManagedThreadId}  {Path.GetFileName(filePath)} {DateTime.Now.ToString("HH:mm:ss.fff")} <<<<<<<<<");
+                }));
 
             }
 
